@@ -10,8 +10,8 @@ from ScriptedModel import ScriptedModel
 
 
 def main():
-    datapath = "/data/nlp/corpora/processors/en/ner-conll/"
-    embedpath = "/data/nlp/corpora/glove/glove.840B.300d.10f.txt"
+    datapath = "../../../../data/ner-conll/"
+    embedpath = "../../../../data/glove.840B.300d.10f.txt"
     datamodule = NerDatamodule(datapath, embedpath, batch_size=1)
 
     datamodule.prepare_data()
