@@ -33,13 +33,17 @@ def main():
     model = make_model()
 
     def crop_input(sample):
+        return sample[0]        
         input_ids = sample[0]
-        if input_ids.shape[1] >= 50:
-            input_ids = input_ids[:, :50]
+        if input_ids.shape[1] == 50:
+            input_ids
         else:
-            new_inputs = torch.zeros((1, 50), dtype=torch.long)
-            new_inputs[0, : input_ids.shape[1]] = input_ids[0, :]
-            input_ids = new_inputs
+            if input_ids.shape[1] > 50:
+                input_ids = input_ids[:, :50]
+            else:
+                new_inputs = torch.zeros((1, 50), dtype=torch.long)
+                new_inputs[0, : input_ids.shape[1]] = input_ids[0, :]
+                input_ids = new_inputs
         return input_ids
 
     with torch.no_grad():
