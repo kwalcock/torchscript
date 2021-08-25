@@ -18,12 +18,16 @@ def main():
     print(f"Size of dataset: {len(datamodule)}")
     print(f"Size of vocab: {len(datamodule.train_dataset.vocab)}")
 
-    model = LSTMModel(
-        vocab_size=len(datamodule.train_dataset.vocab),
-        embed_dim=300,
-        label_size=datamodule.num_classes,
-        hidden_dim=128,
-    )
+    def make_model():
+        model = LSTMModel(
+            vocab_size=len(datamodule.train_dataset.vocab),
+            embed_dim=300,
+            label_size=datamodule.num_classes,
+            hidden_dim=128,
+        )
+        return model
+
+    model = make_model()
 
     def crop_input(sample):
         input_ids = sample[0]

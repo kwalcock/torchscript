@@ -6,6 +6,7 @@ from tqdm import tqdm
 
 from NerDataloader import NerDatamodule
 from LSTMModel import LSTMModel
+from ScriptedModel import ScriptedModel
 
 
 def main():
@@ -18,15 +19,18 @@ def main():
     print(f"Size of dataset: {len(datamodule)}")
     print(f"Size of vocab: {len(datamodule.train_dataset.vocab)}")
 
-    model = LSTMModel(
-        vocab_size=len(datamodule.train_dataset.vocab),
-        embed_dim=300,
-        label_size=datamodule.num_classes,
-        hidden_dim=128,
-    )
-    example_input = torch.randint(1, 70000, (1, 50))
+    def make_model():
+        model = LSTMModel(
+            vocab_size=len(datamodule.train_dataset.vocab),
+            embed_dim=300,
+            label_size=datamodule.num_classes,
+            hidden_dim=128,
+        )
+        example_input = torch.randint(1, 70000, (1, 50))
+        traced_forward = torch.jit.trace(model, example_input)
+        return ScriptedModel(traced_forward)
 
-    traced_forward = torch.jit.trace(model, example_input)
+    model = make_model()
 
     def crop_input(sample):
         input_ids = sample[0]
@@ -43,7 +47,7 @@ def main():
         for sample in tqdm(datamodule.train_dataloader()):
             cropped = crop_input(sample)
             start = time.time()
-            traced_forward(cropped)
+            model.forward(cropped)
             train_times.append(time.time() - start)
         print(f"Mean train sample time: {sum(train_times)/len(train_times)}")
         print(f"                 stdev: {stdev(train_times)}")
@@ -52,7 +56,7 @@ def main():
         for sample in tqdm(datamodule.val_dataloader()):
             cropped = crop_input(sample)
             start = time.time()
-            traced_forward(cropped)
+            model.forward(cropped)
             val_times.append(time.time() - start)
         print(f"Mean val sample time: {sum(val_times)/len(val_times)}")
         print(f"                 stdev: {stdev(val_times)}")
@@ -61,7 +65,7 @@ def main():
         for sample in tqdm(datamodule.test_dataloader()):
             cropped = crop_input(sample)
             start = time.time()
-            traced_forward(cropped)
+            model.forward(cropped)
             test_times.append(time.time() - start)
         print(f"Mean test sample time: {sum(test_times)/len(test_times)}")
         print(f"                 stdev: {stdev(test_times)}")
