@@ -1,3 +1,4 @@
+import os.path
 import time
 from statistics import stdev
 
@@ -12,8 +13,10 @@ from ScriptedModel import ScriptedModel
 def main():
     datapath = "../../../../data/ner-conll/"
     embedpath = "../../../../data/glove.840B.300d.10f.txt"
+    modelpath = "./model.pt"
     datamodule = NerDatamodule(datapath, embedpath, batch_size=1)
-    crop = 50
+    example_crop = 50
+    crop = 0
 
     datamodule.prepare_data()
     datamodule.setup("training")
@@ -21,14 +24,20 @@ def main():
     print(f"Size of vocab: {len(datamodule.train_dataset.vocab)}")
 
     def make_model():
-        model = LSTMModel(
-            vocab_size=len(datamodule.train_dataset.vocab),
-            embed_dim=300,
-            label_size=datamodule.num_classes,
-            hidden_dim=128,
-        )
-        example_input = torch.randint(1, 70000, (1, crop))
-        traced_forward = torch.jit.trace(model, example_input)
+        # if the file exists, load it
+        if os.path.isfile(modelpath):
+            traced_forward = torch.jit.load(modelpath)
+        else:
+            model = LSTMModel(
+                vocab_size=len(datamodule.train_dataset.vocab),
+                embed_dim=300,
+                label_size=datamodule.num_classes,
+                hidden_dim=128,
+            )
+            example_input = torch.randint(1, 70000, (1, example_crop))
+            traced_forward = torch.jit.trace(model, example_input)
+            traced_forward.save(modelpath)
+        print(traced_forward.code)
         return ScriptedModel(traced_forward)
 
     model = make_model()
@@ -63,7 +72,7 @@ def main():
             model.forward(cropped)
             val_times.append(time.time() - start)
         print(f"Mean val sample time: {sum(val_times)/len(val_times)}")
-        print(f"                 stdev: {stdev(val_times)}")
+        print(f"               stdev: {stdev(val_times)}")
 
         test_times = []
         for sample in tqdm(datamodule.test_dataloader()):
@@ -72,7 +81,7 @@ def main():
             model.forward(cropped)
             test_times.append(time.time() - start)
         print(f"Mean test sample time: {sum(test_times)/len(test_times)}")
-        print(f"                 stdev: {stdev(test_times)}")
+        print(f"                stdev: {stdev(test_times)}")
 
 
 if __name__ == "__main__":
