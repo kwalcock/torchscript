@@ -6,7 +6,7 @@ import org.pytorch.Tensor;
 
 import java.util.Arrays;
 
-public class App {
+public class JavaApp {
   public static void main(String[] args) {
     Module mod = Module.load("./demo/data/demo-model.pt1");
     Tensor data =
