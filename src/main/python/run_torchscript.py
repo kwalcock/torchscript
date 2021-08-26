@@ -27,7 +27,7 @@ def main():
             label_size=datamodule.num_classes,
             hidden_dim=128,
         )
-        example_input = torch.randint(1, 70000, (1, 50))
+        example_input = torch.randint(1, 70000, (1, crop))
         traced_forward = torch.jit.trace(model, example_input)
         return ScriptedModel(traced_forward)
 
@@ -76,4 +76,5 @@ def main():
 
 
 if __name__ == "__main__":
+    print(torch.__version__)   
     main()
