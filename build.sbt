@@ -3,11 +3,17 @@ ThisBuild / version          := "0.1.0-SNAPSHOT"
 ThisBuild / organization     := "com.keithalcock"
 ThisBuild / organizationName := "Keith Alcock"
 
+ThisBuild / Test / fork := true // This doesn't seem to work.
+
 name := "torchscript"
  
+lazy val library = project
+
 lazy val root = (project in file("."))
+  .dependsOn(library)
 
 lazy val demo = project
+  .dependsOn(library)
 
 libraryDependencies ++= {
   Seq(

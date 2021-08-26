@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public class App {
   public static void main(String[] args) {
-    Module mod = Module.load("./data/demo-model.pt1");
+    Module mod = Module.load("./demo/data/demo-model.pt1");
     Tensor data =
         Tensor.fromBlob(
             new int[] {1, 2, 3, 4, 5, 6}, // data
