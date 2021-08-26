@@ -9,7 +9,14 @@ lazy val root = (project in file("."))
 
 libraryDependencies ++= {
   Seq(
-    "org.scalatest" %% "scalatest" % "3.2.8" % Test
+    // This one requires the next.
+    // "org.pytorch"           % "pytorch_java_only" % "1.9.0",
+    // The next one can't be found.  Use jars in lib directory.
+    // "com.facebook.fbjni"    % "fbjni-java-only"   % "0.0.3",
+    // And this is a transitive dependency
+    // "com.facebook.soloader" % "nativeloader"      % "0.8.0",
+    "org.scalatest"     %% "scalatest"         % "3.2.8" % Test
   )
 }
+
 
