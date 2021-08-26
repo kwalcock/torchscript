@@ -7,6 +7,8 @@ name := "torchscript"
  
 lazy val root = (project in file("."))
 
+lazy val demo = project
+
 libraryDependencies ++= {
   Seq(
     // This one requires the next.
