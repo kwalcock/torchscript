@@ -13,6 +13,7 @@ def main():
     datapath = "../../../../data/ner-conll/"
     embedpath = "../../../../data/glove.840B.300d.10f.txt"
     datamodule = NerDatamodule(datapath, embedpath, batch_size=1)
+    crop = 50
 
     datamodule.prepare_data()
     datamodule.setup("training")
@@ -33,16 +34,15 @@ def main():
     model = make_model()
 
     def crop_input(sample):
-        return sample[0]        
         input_ids = sample[0]
-        if input_ids.shape[1] == 50:
-            input_ids
+        if crop <= 0 or input_ids.shape[1] == crop:
+            pass
         else:
-            if input_ids.shape[1] > 50:
-                input_ids = input_ids[:, :50]
+            if input_ids.shape[1] > crop:
+                input_ids = input_ids[:, :crop]
             else:
-                new_inputs = torch.zeros((1, 50), dtype=torch.long)
-                new_inputs[0, : input_ids.shape[1]] = input_ids[0, :]
+                new_inputs = torch.zeros((1, crop), dtype=torch.long)
+                new_inputs[:, :input_ids.shape[1]] = input_ids[:, :]
                 input_ids = new_inputs
         return input_ids
 
