@@ -4,7 +4,7 @@ from statistics import stdev
 import torch
 from tqdm import tqdm # A Fast, Extensible Progress Bar for Python and CLI
 
-from NerDataloader import NerDatamodule
+from NerDatamodule import NerDatamodule
 from LSTMModel import LSTMModel
 
 
