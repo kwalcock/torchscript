@@ -89,9 +89,9 @@ def main():
             cropped = crop_input(sample)
             start = time.time()
             result = model.forward(cropped)
+            times.append(time.time() - start)
             print_shape(result)
             print_data(result)
-            times.append(time.time() - start)
         print(f"  Mean {name} sample time: {sum(times)/len(times):.8f}")
         print(f"Stddev {name} sample time: {stdev(times):.8f}")
 
