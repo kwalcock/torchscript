@@ -23,8 +23,7 @@ object RunTorchScript extends App {
 
   val timer = new Timer("The timer")
 
-  {
-    // Train
+  def runDataset(name: String, dataset: NerDataset): Unit = {
     val times = datamodule.trainDataset.map { tensorPair =>
       val cropped = cropInput(tensorPair)
       timer.time {
@@ -32,33 +31,11 @@ object RunTorchScript extends App {
       }
       timer.getElapsed
     }
-    println(s"Mean train sample time: ${timer.mean(times)}")
-    println(s"                 stdev: ${timer.stddev(times)}")
+    println(s"  Mean $name sample time: ${timer.mean(times)}")
+    println(s"Stddev $name sample: ${timer.stddev(times)}")
   }
 
-  {
-    // Val
-    val times = datamodule.valDataset.map { tensorPair =>
-      val cropped = cropInput(tensorPair)
-      timer.time {
-        model.forward(IValue.from(cropped))
-      }
-      timer.getElapsed
-    }
-    println(s"Mean val sample time: ${timer.mean(times)}")
-    println(s"               stdev: ${timer.stddev(times)}")
-  }
-
-  {
-    // Test
-    val times = datamodule.testDataset.map { tensorPair =>
-      val cropped = cropInput(tensorPair)
-      timer.time {
-        model.forward(IValue.from(cropped))
-      }
-      timer.getElapsed
-    }
-    println(s"Mean test sample time: ${timer.mean(times)}")
-    println(s"                stdev: ${timer.stddev(times)}")
-  }
+  runDataset("train", datamodule.trainDataset)
+  runDataset("val  ", datamodule.valDataset)
+  runDataset("test ", datamodule.testDataset)
 }
