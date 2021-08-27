@@ -29,7 +29,7 @@ class NerDataset(datasetPath: String, embeddingPath: String) extends IndexedSeq[
         labels.clear()
       }
       else {
-        val Array(token, label) = cur.split('\t')
+        val Array(token, label) = cur.split(' ')
         tokens.append(token)
         labels.append(label)
 
@@ -48,8 +48,9 @@ class NerDataset(datasetPath: String, embeddingPath: String) extends IndexedSeq[
   {
     val source = Source.fromFile(embeddingPath)
 
+    // TODO: Skip first line
     source.getLines.foreach { line =>
-      val cur = line.trim.split('\t').head
+      val cur = StringUtils.beforeFirst(line, ' ')
 
       this.vocab(cur) = -1
     }

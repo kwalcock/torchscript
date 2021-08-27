@@ -13,7 +13,7 @@ from ScriptedModel import ScriptedModel
 def main():
     datapath = "../../../../data/ner-conll/"
     embedpath = "../../../../data/glove.840B.300d.10f.txt"
-    modelpath = "./model.pt"
+    modelpath = "../../../../data/model.pt"
     datamodule = NerDatamodule(datapath, embedpath, batch_size=1)
     example_crop = 50
     crop = 0
