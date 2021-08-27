@@ -62,8 +62,8 @@ def main():
             start = time.time()
             model.forward(cropped)
             train_times.append(time.time() - start)
-        print(f"Mean train sample time: {sum(train_times)/len(train_times)}")
-        print(f"                 stdev: {stdev(train_times)}")
+        print(f"  Mean train sample time: {sum(train_times)/len(train_times)}")
+        print(f"Stddev train sample time: {stdev(train_times)}")
 
         val_times = []
         for sample in tqdm(datamodule.val_dataloader()):
@@ -71,8 +71,8 @@ def main():
             start = time.time()
             model.forward(cropped)
             val_times.append(time.time() - start)
-        print(f"Mean val sample time: {sum(val_times)/len(val_times)}")
-        print(f"               stdev: {stdev(val_times)}")
+        print(f"  Mean val   sample time: {sum(val_times)/len(val_times)}")
+        print(f"Stddev val   sample time: {stdev(val_times)}")
 
         test_times = []
         for sample in tqdm(datamodule.test_dataloader()):
@@ -80,8 +80,8 @@ def main():
             start = time.time()
             model.forward(cropped)
             test_times.append(time.time() - start)
-        print(f"Mean test sample time: {sum(test_times)/len(test_times)}")
-        print(f"                stdev: {stdev(test_times)}")
+        print(f"  Mean test  sample time: {sum(test_times)/len(test_times)}")
+        print(f"Stddev test  sample time: {stdev(test_times)}")
 
 
 if __name__ == "__main__":
