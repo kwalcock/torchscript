@@ -4,8 +4,6 @@ import org.pytorch.IValue
 import org.pytorch.Module
 import org.pytorch.Tensor
 
-import java.io.File
-
 object RunTorchScript extends App {
   val datapath = "../data/ner-conll/"
   val embedpath = "../data/glove.840B.300d.10f.txt"
@@ -32,10 +30,12 @@ object RunTorchScript extends App {
       timer.getElapsed
     }
     println(s"  Mean $name sample time: ${timer.mean(times)}")
-    println(s"Stddev $name sample: ${timer.stddev(times)}")
+    println(s"Stddev $name sample time: ${timer.stddev(times)}")
   }
 
   runDataset("train", datamodule.trainDataset)
-  runDataset("val  ", datamodule.valDataset)
-  runDataset("test ", datamodule.testDataset)
+  runDataset("  val", datamodule.valDataset)
+  runDataset(" test", datamodule.testDataset)
+
+  System.exit(0);
 }
