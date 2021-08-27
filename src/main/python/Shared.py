@@ -15,7 +15,7 @@ def make_model(size_of_vocab, size_of_labels):
     )
     return model
 
-def crop_input(sample):
+def crop_input(sample, crop):
     input_ids = sample[0]
     if crop <= 0 or input_ids.shape[1] == crop:
         pass
@@ -56,10 +56,10 @@ def print_data(tensor):
         i += 1
     print()
 
-def run_dataset(name, dataset):
+def run_dataset(model, name, crop, dataset):
     times = []
     for sample in dataset: # tqdm(dataset):
-        cropped = crop_input(sample)
+        cropped = crop_input(sample, crop)
         start = time.time()
         result = model.forward(cropped)
         times.append(time.time() - start)

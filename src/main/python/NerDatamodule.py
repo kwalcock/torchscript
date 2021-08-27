@@ -13,15 +13,13 @@ class NerDatamodule:
         self.embed_path = embedding_path
         self.batch_size = batch_size
 
-    def prepare_data(self) -> None:
-        self.train_dataset = NerDataset(
-            os.path.join(self.dataset_path, "eng-2col.train"), self.embed_path
-        )
-        self.val_dataset = NerDataset(
-            os.path.join(self.dataset_path, "eng-2col.testa"), self.embed_path
-        )
-        self.test_dataset = NerDataset(
-            os.path.join(self.dataset_path, "eng-2col.testb"), self.embed_path
+        self.train_dataset = self.prepare_file("eng-2col.train")
+        self.val_dataset = self.prepare_file("eng-2col.testa")
+        self.test_dataset = self.prepare_file("eng-2col.testb")
+
+    def prepare_file(self, filename):
+        return NerDataset(
+            os.path.join(self.dataset_path, filename), self.embed_path
         )
 
     def setup(self, stage) -> None:
@@ -36,30 +34,25 @@ class NerDatamodule:
             out_tensors.append(sent)
             out_labels.append(labels)
 
-        out_tensors = pad_sequence(out_tensors, batch_first=True, padding_value=0)
-        out_labels = pad_sequence(out_labels, batch_first=True, padding_value=-1)
+        out_tensors = pad_sequence(out_tensors, batch_first = True, padding_value = 0)
+        out_labels = pad_sequence(out_labels, batch_first = True, padding_value = -1)
         return out_tensors, out_labels
 
     def __len__(self):
         return self.size
 
-    def train_dataloader(self):
+    def new_dataloader(self, dataset):
         return DataLoader(
-            self.train_dataset,
-            batch_size=self.batch_size,
-            collate_fn=NerDatamodule.collate_fn,
+            dataset,
+            batch_size = self.batch_size,
+            collate_fn = NerDatamodule.collate_fn,
         )
+
+    def train_dataloader(self):
+        return self.new_dataloader(self.train_dataset)
 
     def val_dataloader(self):
-        return DataLoader(
-            self.val_dataset,
-            batch_size=self.batch_size,
-            collate_fn=NerDatamodule.collate_fn,
-        )
+        return self.new_dataloader(self.val_dataset)
 
     def test_dataloader(self):
-        return DataLoader(
-            self.test_dataset,
-            batch_size=self.batch_size,
-            collate_fn=NerDatamodule.collate_fn,
-        )
+        return self.new_dataloader(self.test_dataset)

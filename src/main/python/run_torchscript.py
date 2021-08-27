@@ -3,10 +3,9 @@ import os.path
 import torch
 
 from NerDatamodule import NerDatamodule
-from LSTMModel import LSTMModel
 from ScriptedModel import ScriptedModel
 
-from Shared import make_model
+from Shared import make_model, run_dataset
 
 def main():
     datapath = "../../../../data/ner-conll/"
@@ -16,7 +15,6 @@ def main():
     example_crop = 50
     crop = 0
 
-    datamodule.prepare_data()
     datamodule.setup("training")
     print(f"Size of dataset: {len(datamodule)}")
     print(f"Size of vocab: {len(datamodule.train_dataset.vocab)}")
@@ -36,9 +34,9 @@ def main():
     model = make_scripted_model(len(datamodule.train_dataset.vocab))
 
     with torch.no_grad():
-        run_dataset("train", datamodule.train_dataloader())
-        run_dataset("  val", datamodule.val_dataloader())
-        run_dataset(" test", datamodule.test_dataloader())
+        run_dataset(model, "train", crop, datamodule.train_dataloader())
+        run_dataset(model, "  val", crop, datamodule.val_dataloader())
+        run_dataset(model, " test", crop, datamodule.test_dataloader())
 
 
 if __name__ == "__main__":
