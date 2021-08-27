@@ -10,7 +10,6 @@ def main():
     datamodule = NerDatamodule(datapath, embedpath, batch_size = 1)
     crop = 0
 
-    datamodule.setup("training")
     print(f"Size of dataset: {len(datamodule)}")
     print(f"Size of vocab: {len(datamodule.train_dataset.vocab)}")
 

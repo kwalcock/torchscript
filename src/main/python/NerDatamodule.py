@@ -17,16 +17,15 @@ class NerDatamodule:
         self.val_dataset = self.prepare_file("eng-2col.testa")
         self.test_dataset = self.prepare_file("eng-2col.testb")
 
-    def prepare_file(self, filename):
-        return NerDataset(
-            os.path.join(self.dataset_path, filename), self.embed_path
-        )
-
-    def setup(self, stage) -> None:
         self.size = (
             len(self.train_dataset) + len(self.val_dataset) + len(self.test_dataset)
         )
         self.num_classes = len(self.train_dataset.labels)
+
+    def prepare_file(self, filename):
+        return NerDataset(
+            os.path.join(self.dataset_path, filename), self.embed_path
+        )
 
     def collate_fn(batch):
         out_tensors, out_labels = [], []

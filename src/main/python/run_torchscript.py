@@ -15,7 +15,6 @@ def main():
     example_crop = 50
     crop = 0
 
-    datamodule.setup("training")
     print(f"Size of dataset: {len(datamodule)}")
     print(f"Size of vocab: {len(datamodule.train_dataset.vocab)}")
 
@@ -31,7 +30,7 @@ def main():
         # print(traced_forward.code)
         return ScriptedModel(traced_forward)
 
-    model = make_scripted_model(len(datamodule.train_dataset.vocab))
+    model = make_scripted_model(len(datamodule.train_dataset.vocab), datamodule.num_classes)
 
     with torch.no_grad():
         run_dataset(model, "train", crop, datamodule.train_dataloader())
