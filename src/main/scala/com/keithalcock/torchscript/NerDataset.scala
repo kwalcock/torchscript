@@ -6,13 +6,12 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
-class NerDataset(datasetPath: String, embeddingPath: String) extends IndexedSeq[(Tensor, Tensor)] {
+class NerDataset(datasetPath: String, val vocab: Map[String, Int]) extends IndexedSeq[(Tensor, Tensor)] {
 
   case class Sample(tokens: Array[String], labels: Array[String])
 
   val samples = new ArrayBuffer[Sample]()
   val labels = mutable.Map.empty[String, Int]
-  val vocab = mutable.Map.empty[String, Int]
 
   {
     // Return the samples and labels from this?
@@ -45,31 +44,13 @@ class NerDataset(datasetPath: String, embeddingPath: String) extends IndexedSeq[
     }
   }
 
-  {
-    val source = Source.fromFile(embeddingPath)
-
-    // TODO: Skip first line
-    source.getLines.foreach { line =>
-      val cur = StringUtils.beforeFirst(line, ' ')
-
-      this.vocab(cur) = -1
-    }
-    source.close
-
-    // Add one so that we can preserve index 0 for our padding
-    this.vocab.keys.toSeq.sorted.zipWithIndex.foreach { case (key, index) =>
-      this.vocab(key) = index + 1
-    }
-    this.vocab(NerDataset.mask) = this.vocab.size
-  }
-
   override def length: Int = samples.length
 
   override def apply(index: Int): (Tensor, Tensor) = {
     require(0 <= index && index < length)
     val sample = samples(index)
     val tokenIndexes = sample.tokens.map { token =>
-      vocab.getOrElse(token, vocab(NerDataset.mask))
+      vocab.getOrElse(token, vocab(NerVocab.mask))
     }
     val labelIndexes = sample.labels.map { label =>
       labels(label)
@@ -80,8 +61,4 @@ class NerDataset(datasetPath: String, embeddingPath: String) extends IndexedSeq[
       Tensor.fromBlob(labelIndexes, Array(1L, labelIndexes.length.toLong))
     )
   }
-}
-
-object NerDataset {
-  val mask = "<MASK>"
 }
