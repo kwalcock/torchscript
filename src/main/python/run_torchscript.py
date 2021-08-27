@@ -37,7 +37,7 @@ def main():
             example_input = torch.randint(1, 70000, (1, example_crop))
             traced_forward = torch.jit.trace(model, example_input)
             traced_forward.save(modelpath)
-        print(traced_forward.code)
+        # print(traced_forward.code)
         return ScriptedModel(traced_forward)
 
     model = make_model()
@@ -55,30 +55,64 @@ def main():
                 input_ids = new_inputs
         return input_ids
 
+    def printShape(tensor):
+        shape = tensor.shape
+        i = 0
+        for value in shape:
+            if i > 0:
+                print(", ", end = "")
+            print(value, end = "")
+            i += 1
+        print()
+
+    # https://stackabuse.com/python-how-to-flatten-list-of-lists/
+    def flatten(list_of_lists):
+        if len(list_of_lists) == 0:
+            return list_of_lists
+        if isinstance(list_of_lists[0], list):
+            return flatten(list_of_lists[0]) + flatten(list_of_lists[1:])
+        return list_of_lists[:1] + flatten(list_of_lists[1:])
+
+    def printData(tensor):
+        data = tensor.data
+        i = 0
+        for value in flatten(data.tolist()):
+            if i > 0:
+                print(", ", end = "")
+            print("{:1.8f}".format(value), end = "")
+            i += 1
+        print()
+
     with torch.no_grad():
         train_times = []
-        for sample in tqdm(datamodule.train_dataloader()):
+        for sample in datamodule.train_dataloader(): # tqdm(datamodule.train_dataloader()):
             cropped = crop_input(sample)
             start = time.time()
-            model.forward(cropped)
+            result = model.forward(cropped)
+            printShape(result)
+            printData(result)
             train_times.append(time.time() - start)
         print(f"  Mean train sample time: {sum(train_times)/len(train_times)}")
         print(f"Stddev train sample time: {stdev(train_times)}")
 
         val_times = []
-        for sample in tqdm(datamodule.val_dataloader()):
+        for sample in datamodule.val_dataloader(): # tqdm(datamodule.val_dataloader()):
             cropped = crop_input(sample)
             start = time.time()
-            model.forward(cropped)
+            result = model.forward(cropped)
+            printShape(result)
+            printData(result)
             val_times.append(time.time() - start)
         print(f"  Mean   val sample time: {sum(val_times)/len(val_times)}")
         print(f"Stddev   val sample time: {stdev(val_times)}")
 
         test_times = []
-        for sample in tqdm(datamodule.test_dataloader()):
+        for sample in datamodule.test_dataloader(): # tqdm(datamodule.test_dataloader()):
             cropped = crop_input(sample)
             start = time.time()
-            model.forward(cropped)
+            result = model.forward(cropped)
+            printShape(result)
+            printData(result)
             test_times.append(time.time() - start)
         print(f"  Mean  test sample time: {sum(test_times)/len(test_times)}")
         print(f"Stddev  test sample time: {stdev(test_times)}")

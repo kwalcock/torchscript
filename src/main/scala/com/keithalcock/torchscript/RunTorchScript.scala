@@ -25,7 +25,10 @@ object RunTorchScript extends App {
     val times = datamodule.trainDataset.map { tensorPair =>
       val cropped = cropInput(tensorPair)
       timer.time {
-        model.forward(IValue.from(cropped))
+        val result = model.forward(IValue.from(cropped))
+        println(result.toTensor.shape.mkString(", "))
+        println(result.toTensor.getDataAsFloatArray.map(value => f"$value%1.8f").mkString(", ")) // Can't be double
+        result
       }
       timer.getElapsed
     }
