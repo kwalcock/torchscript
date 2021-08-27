@@ -55,7 +55,7 @@ def main():
                 input_ids = new_inputs
         return input_ids
 
-    def printShape(tensor):
+    def print_shape(tensor):
         shape = tensor.shape
         i = 0
         for value in shape:
@@ -73,49 +73,32 @@ def main():
             return flatten(list_of_lists[0]) + flatten(list_of_lists[1:])
         return list_of_lists[:1] + flatten(list_of_lists[1:])
 
-    def printData(tensor):
+    def print_data(tensor):
         data = tensor.data
         i = 0
         for value in flatten(data.tolist()):
             if i > 0:
                 print(", ", end = "")
-            print("{:1.8f}".format(value), end = "")
+            print(f"{value:1.8f}", end = "")
             i += 1
         print()
 
+    def run_dataset(name, dataset):
+        times = []
+        for sample in dataset: # tqdm(dataset):
+            cropped = crop_input(sample)
+            start = time.time()
+            result = model.forward(cropped)
+            print_shape(result)
+            print_data(result)
+            times.append(time.time() - start)
+        print(f"  Mean {name} sample time: {sum(times)/len(times):.8f}")
+        print(f"Stddev {name} sample time: {stdev(times):.8f}")
+
     with torch.no_grad():
-        train_times = []
-        for sample in datamodule.train_dataloader(): # tqdm(datamodule.train_dataloader()):
-            cropped = crop_input(sample)
-            start = time.time()
-            result = model.forward(cropped)
-            printShape(result)
-            printData(result)
-            train_times.append(time.time() - start)
-        print(f"  Mean train sample time: {sum(train_times)/len(train_times)}")
-        print(f"Stddev train sample time: {stdev(train_times)}")
-
-        val_times = []
-        for sample in datamodule.val_dataloader(): # tqdm(datamodule.val_dataloader()):
-            cropped = crop_input(sample)
-            start = time.time()
-            result = model.forward(cropped)
-            printShape(result)
-            printData(result)
-            val_times.append(time.time() - start)
-        print(f"  Mean   val sample time: {sum(val_times)/len(val_times)}")
-        print(f"Stddev   val sample time: {stdev(val_times)}")
-
-        test_times = []
-        for sample in datamodule.test_dataloader(): # tqdm(datamodule.test_dataloader()):
-            cropped = crop_input(sample)
-            start = time.time()
-            result = model.forward(cropped)
-            printShape(result)
-            printData(result)
-            test_times.append(time.time() - start)
-        print(f"  Mean  test sample time: {sum(test_times)/len(test_times)}")
-        print(f"Stddev  test sample time: {stdev(test_times)}")
+        run_dataset("train", datamodule.train_dataloader())
+        run_dataset("  val", datamodule.val_dataloader())
+        run_dataset(" test", datamodule.test_dataloader())
 
 
 if __name__ == "__main__":

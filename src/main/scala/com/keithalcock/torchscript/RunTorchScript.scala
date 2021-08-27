@@ -22,18 +22,18 @@ object RunTorchScript extends App {
   val timer = new Timer("The timer")
 
   def runDataset(name: String, dataset: NerDataset): Unit = {
-    val times = datamodule.trainDataset.map { tensorPair =>
+    val times = dataset.map { tensorPair =>
       val cropped = cropInput(tensorPair)
       timer.time {
         val result = model.forward(IValue.from(cropped))
         println(result.toTensor.shape.mkString(", "))
-        println(result.toTensor.getDataAsFloatArray.map(value => f"$value%1.8f").mkString(", ")) // Can't be double
+        println(result.toTensor.getDataAsFloatArray.map(value => f"$value%1.8f").mkString(", ")) // can't be double
         result
       }
       timer.getElapsed
     }
-    println(s"  Mean $name sample time: ${timer.mean(times)}")
-    println(s"Stddev $name sample time: ${timer.stddev(times)}")
+    println(f"  Mean $name sample time: ${timer.mean(times)}%.8f")
+    println(f"Stddev $name sample time: ${timer.stddev(times)}%.8f")
   }
 
   runDataset("train", datamodule.trainDataset)
