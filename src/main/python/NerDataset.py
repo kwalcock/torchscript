@@ -1,12 +1,13 @@
 import torch
 from torch.utils.data import Dataset
 
+from NerVocab import mask
 
 class NerDataset(Dataset):
-    def __init__(self, dataset_path, embedding_path):
+    def __init__(self, dataset_path, vocab):
         self.samples = []
         self.labels = {}
-        self.vocab = {}
+        self.vocab = vocab
 
         # Load data and construct label map
         with open(dataset_path, "r") as data_file:
@@ -28,19 +29,6 @@ class NerDataset(Dataset):
         for i, label in enumerate(sorted(self.labels.keys())):
             self.labels[label] = i
 
-        # Load word embeddings, (we just care about which tokens are in our vocab)
-        with open(embedding_path, "r") as embed_file:
-            for line in embed_file:
-                cur = line.strip().split()[
-                    0
-                ]  # Format is: token e_0 e_1 ... e_n-2 e_n-1
-                self.vocab[cur] = -1
-
-        # Add one so that we can preserve index 0 for our padding
-        for i, token in enumerate(sorted(self.vocab.keys())):
-            self.vocab[token] = i + 1
-        self.vocab["<MASK>"] = len(self.vocab)
-
     def __len__(self):
         return len(self.samples)
 
@@ -53,7 +41,7 @@ class NerDataset(Dataset):
             if token in self.vocab:
                 out_sent.append(self.vocab[token])
             else:
-                out_sent.append(self.vocab["<MASK>"])
+                out_sent.append(self.vocab[mask])
 
         out_labels = [self.labels[label] for label in labels]
 

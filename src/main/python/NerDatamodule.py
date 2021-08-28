@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader
 from torch.nn.utils.rnn import pad_sequence
 
 from NerDataset import NerDataset
+from NerVocab import read_vocab
 
 
 class NerDatamodule:
@@ -13,18 +14,20 @@ class NerDatamodule:
         self.embed_path = embedding_path
         self.batch_size = batch_size
 
-        self.train_dataset = self.prepare_file("eng-2col.train")
-        self.val_dataset = self.prepare_file("eng-2col.testa")
-        self.test_dataset = self.prepare_file("eng-2col.testb")
+        vocab = read_vocab(embedding_path)
+
+        self.train_dataset = self.prepare_file("eng-2col.train", vocab)
+        self.val_dataset = self.prepare_file("eng-2col.testa", vocab)
+        self.test_dataset = self.prepare_file("eng-2col.testb", vocab)
 
         self.size = (
             len(self.train_dataset) + len(self.val_dataset) + len(self.test_dataset)
         )
         self.num_classes = len(self.train_dataset.labels)
 
-    def prepare_file(self, filename):
+    def prepare_file(self, filename, vocab):
         return NerDataset(
-            os.path.join(self.dataset_path, filename), self.embed_path
+            os.path.join(self.dataset_path, filename), vocab
         )
 
     def collate_fn(batch):
