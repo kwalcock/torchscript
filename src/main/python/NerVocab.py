@@ -14,9 +14,9 @@ def read_vocab(embedding_path):
 
     # Add one so that we can preserve index 0 for our padding
     for i, token in enumerate(sorted(vocab.keys())):
-        print(f"{i + 1}\t{token}")
         vocab[token] = i + 1
+        # print(f"{i + 1}\t{token}")
     vocab[mask] = 0
-    print(f"{vocab[mask]}\t{mask}")
+    # print(f"{vocab[mask]}\t{mask}")
 
     return vocab

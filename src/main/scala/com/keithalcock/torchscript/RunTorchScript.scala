@@ -27,8 +27,8 @@ object RunTorchScript extends App {
       val result = timer.time {
         model.forward(IValue.from(cropped))
       }
-      println(result.toTensor.shape.mkString(", "))
-      println(result.toTensor.getDataAsFloatArray.map(value => f"$value%1.8f").mkString(", ")) // can't be double
+      // println(result.toTensor.shape.mkString(", "))
+      // println(result.toTensor.getDataAsFloatArray.map(value => f"$value%1.8f").mkString(", ")) // can't be double
       timer.getElapsed
     }
     println(f"  Mean $name sample time: ${timer.mean(times)}%.8f")
