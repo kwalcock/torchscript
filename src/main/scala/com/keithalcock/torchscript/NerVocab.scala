@@ -14,11 +14,12 @@ object NerVocab {
       source.close
       words
     }
-    // This last one isn't technically sorted.
-    val sortedWords = words.sorted :+ mask
+    // This first one isn't technically sorted.
+    val sortedWords = mask +: words.sorted
     // Add one so that we can preserve index 0 for our padding
     val vocab = sortedWords.zipWithIndex.map { case (word, index) =>
-      word -> (index + 1)
+      println(s"${index}\t$word")
+      word -> index
     }.toMap
 
     vocab
