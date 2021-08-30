@@ -1,6 +1,6 @@
-package com.keithalcock.torchscript
+package org.clulab.torchscript
 
-import com.keithalcock.torchscript.utils.Timer
+import org.clulab.torchscript.utils.Timer
 import org.pytorch.IValue
 import org.pytorch.Module
 import org.pytorch.Tensor

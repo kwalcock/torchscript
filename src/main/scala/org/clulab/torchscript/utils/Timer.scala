@@ -1,4 +1,4 @@
-package com.keithalcock.torchscript.utils
+package org.clulab.torchscript.utils
 
 class Timer(val description: String) {
   protected var elapsedTime: Option[Long] = None

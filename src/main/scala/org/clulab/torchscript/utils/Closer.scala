@@ -1,4 +1,4 @@
-package com.keithalcock.torchscript.utils
+package org.clulab.torchscript.utils
 
 import scala.util.control.NonFatal
 

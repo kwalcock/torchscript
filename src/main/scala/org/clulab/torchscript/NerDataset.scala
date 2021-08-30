@@ -1,6 +1,6 @@
-package com.keithalcock.torchscript
+package org.clulab.torchscript
 
-import com.keithalcock.torchscript.utils.Closer.AutoCloser
+import org.clulab.torchscript.utils.Closer.AutoCloser
 import org.pytorch.Tensor
 
 import scala.collection.mutable

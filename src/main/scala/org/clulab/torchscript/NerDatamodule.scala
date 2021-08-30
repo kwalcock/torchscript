@@ -1,4 +1,4 @@
-package com.keithalcock.torchscript
+package org.clulab.torchscript
 
 class NerDatamodule(datasetPath: String, embeddingPath: String) {
   val vocab: Map[String, Int] = NerVocab(embeddingPath)

@@ -1,4 +1,4 @@
-package com.keithalcock.torchscript.utils
+package org.clulab.torchscript.utils
 
 import java.io._
 import java.nio.charset.StandardCharsets

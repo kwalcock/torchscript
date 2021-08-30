@@ -1,7 +1,7 @@
-package com.keithalcock.torchscript
+package org.clulab.torchscript
 
-import com.keithalcock.torchscript.utils.Closer.AutoCloser
-import com.keithalcock.torchscript.utils.StringUtils
+import org.clulab.torchscript.utils.Closer.AutoCloser
+import org.clulab.torchscript.utils.StringUtils
 
 import scala.io.Source
 
