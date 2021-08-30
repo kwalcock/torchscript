@@ -1,4 +1,4 @@
-package com.keithalcock.torchscript
+package com.keithalcock.torchscript.utils
 
 class Timer(val description: String) {
   protected var elapsedTime: Option[Long] = None

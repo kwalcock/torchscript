@@ -1,18 +1,18 @@
 package com.keithalcock.torchscript
 
+import com.keithalcock.torchscript.utils.Closer.AutoCloser
+import com.keithalcock.torchscript.utils.StringUtils
+
 import scala.io.Source
 
 object NerVocab {
   val mask = "<MASK>"
 
   def apply(embeddingPath: String): Map[String, Int] = {
-    val source = Source.fromFile(embeddingPath)
-    val words = {
-      val words = source.getLines.drop(1).map { line =>
+    val words = Source.fromFile(embeddingPath).autoClose { source =>
+      source.getLines.drop(1).map { line =>
         StringUtils.beforeFirst(line, ' ')
       }.toVector // must be realized before close
-      source.close
-      words
     }
     // This first one isn't technically sorted.
     val sortedWords = mask +: words.sorted

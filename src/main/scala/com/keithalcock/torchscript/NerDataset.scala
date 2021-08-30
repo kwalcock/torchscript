@@ -1,5 +1,6 @@
 package com.keithalcock.torchscript
 
+import com.keithalcock.torchscript.utils.Closer.AutoCloser
 import org.pytorch.Tensor
 
 import scala.collection.mutable
@@ -19,25 +20,26 @@ class NerDataset(datasetPath: String, val vocab: Map[String, Int]) extends Index
     val labels = new ArrayBuffer[String]()
     val source = Source.fromFile(datasetPath)
 
-    source.getLines.foreach { line =>
-      val cur = line.trim
+    Source.fromFile(datasetPath).autoClose { source =>
+      source.getLines.foreach { line =>
+        val cur = line.trim
 
-      if (cur.isEmpty) {
-        samples.append(Sample(tokens.toArray, labels.toArray))
-        tokens.clear()
-        labels.clear()
-      }
-      else {
-        val Array(token, label) = cur.split(' ')
-        tokens.append(token)
-        labels.append(label)
+        if (cur.isEmpty) {
+          samples.append(Sample(tokens.toArray, labels.toArray))
+          tokens.clear()
+          labels.clear()
+        }
+        else {
+          val Array(token, label) = cur.split(' ')
+          tokens.append(token)
+          labels.append(label)
 
-        // Make this one a set and just add
-        if (!this.labels.contains(label))
-          this.labels(label) = -1
+          // Make this one a set and just add
+          if (!this.labels.contains(label))
+            this.labels(label) = -1
+        }
       }
     }
-    source.close
 
     this.labels.keys.toSeq.sorted.zipWithIndex.foreach { case (key, index) =>
       this.labels(key) = index

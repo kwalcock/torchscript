@@ -1,8 +1,11 @@
 package com.keithalcock.torchscript
 
+import com.keithalcock.torchscript.utils.Timer
 import org.pytorch.IValue
 import org.pytorch.Module
 import org.pytorch.Tensor
+
+import java.io.PrintWriter
 
 object RunTorchScript extends App {
   val datapath = "../data/ner-conll/"
@@ -21,23 +24,27 @@ object RunTorchScript extends App {
 
   val timer = new Timer("The timer")
 
-  def runDataset(name: String, dataset: NerDataset): Unit = {
+  def runDataset(name: String, dataset: NerDataset, printWriter: PrintWriter): Unit = {
     val times = dataset.map { tensorPair =>
       val cropped = cropInput(tensorPair)
       val result = timer.time {
         model.forward(IValue.from(cropped))
       }
-      // println(result.toTensor.shape.mkString(", "))
-      // println(result.toTensor.getDataAsFloatArray.map(value => f"$value%1.8f").mkString(", ")) // can't be double
+      printWriter.println(result.toTensor.shape.mkString(", "))
+      printWriter.println(result.toTensor.getDataAsFloatArray.map(value => f"$value%1.8f").mkString(", ")) // can't be double
       timer.getElapsed
     }
     println(f"  Mean $name sample time: ${timer.mean(times)}%.8f")
     println(f"Stddev $name sample time: ${timer.stddev(times)}%.8f")
   }
 
-  runDataset("train", datamodule.trainDataset)
-  runDataset("  val", datamodule.valDataset)
-  runDataset(" test", datamodule.testDataset)
+  1.to(8).foreach { index =>
+    val printWriter = new Sourcenew PrintWriter(System.out)
+
+    runDataset("train", datamodule.trainDataset, printWriter)
+    runDataset("  val", datamodule.valDataset, printWriter)
+    runDataset(" test", datamodule.testDataset, printWriter)
+  }
 
   System.exit(0);
 }

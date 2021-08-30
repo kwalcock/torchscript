@@ -1,4 +1,4 @@
-package com.keithalcock.torchscript
+package com.keithalcock.torchscript.utils
 
 object StringUtils {
 
