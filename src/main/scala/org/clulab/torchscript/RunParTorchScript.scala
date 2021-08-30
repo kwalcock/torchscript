@@ -8,7 +8,7 @@ import org.pytorch.Tensor
 
 import java.io.{File, PrintWriter}
 
-object RunTorchScript extends App {
+object RunParTorchScript extends App {
   val debug = true
   val threads = 1
   val loops = 64
