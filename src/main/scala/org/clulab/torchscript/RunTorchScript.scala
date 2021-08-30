@@ -1,13 +1,18 @@
 package org.clulab.torchscript
 
-import org.clulab.torchscript.utils.Timer
+import org.clulab.torchscript.utils.Closer.AutoCloser
+import org.clulab.torchscript.utils.{FakePrinter, FileUtils, Printer, RealPrinter, ThreadUtils, Timer}
 import org.pytorch.IValue
 import org.pytorch.Module
 import org.pytorch.Tensor
 
-import java.io.PrintWriter
+import java.io.{File, PrintWriter}
 
 object RunTorchScript extends App {
+  val debug = true
+  val threads = 1
+  val loops = 64
+
   val datapath = "../data/ner-conll/"
   val embedpath = "../data/glove.840B.300d.10f.txt"
   val modelpath = "../data/model.pt"
@@ -22,29 +27,41 @@ object RunTorchScript extends App {
 
   def cropInput(tensorPair: (Tensor, Tensor)): Tensor = tensorPair._1
 
-  val timer = new Timer("The timer")
-
-  def runDataset(name: String, dataset: NerDataset, printWriter: PrintWriter): Unit = {
+  def runDataset(name: String, dataset: NerDataset, printer: Printer, index: Int): Unit = {
+    val timer = new Timer("The timer")
     val times = dataset.map { tensorPair =>
       val cropped = cropInput(tensorPair)
       val result = timer.time {
         model.forward(IValue.from(cropped))
       }
-      printWriter.println(result.toTensor.shape.mkString(", "))
-      printWriter.println(result.toTensor.getDataAsFloatArray.map(value => f"$value%1.8f").mkString(", ")) // can't be double
+      printer.println(result.toTensor.shape.mkString(", "))
+      printer.println(result.toTensor.getDataAsFloatArray.map(value => f"$value%1.8f").mkString(", ")) // can't be double
       timer.getElapsed
     }
-    println(f"  Mean $name sample time: ${timer.mean(times)}%.8f")
-    println(f"Stddev $name sample time: ${timer.stddev(times)}%.8f")
+    println(f"  Mean $name sample time $index: ${timer.mean(times)}%.8f")
+    println(f"Stddev $name sample time $index: ${timer.stddev(times)}%.8f")
   }
 
-  1.to(8).foreach { index =>
-    val printWriter = new Sourcenew PrintWriter(System.out)
-
-    runDataset("train", datamodule.trainDataset, printWriter)
-    runDataset("  val", datamodule.valDataset, printWriter)
-    runDataset(" test", datamodule.testDataset, printWriter)
+  def newPrinter(index: Int): Printer = {
+    if (debug)
+      new FakePrinter()
+    else
+      new RealPrinter(FileUtils.newPrintWriterFromFile(new File(s"RunTorchScript-$index.txt")))
   }
+
+
+  val timer = new Timer("elapsed time")
+  timer.time {
+    ThreadUtils.parallelize(1.to(loops), threads).foreach { index =>
+      newPrinter(index).autoClose { printWriter =>
+        runDataset("train", datamodule.trainDataset, printWriter, index)
+        runDataset("  val", datamodule.valDataset, printWriter, index)
+        runDataset(" test", datamodule.testDataset, printWriter, index)
+      }
+    }
+  }
+  val time = timer.getElapsed()
+  println(s"The elapsed time for\t$loops\tloops on\t$threads\tthreads was\t$time\tseconds.")
 
   System.exit(0);
 }
