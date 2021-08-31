@@ -16,7 +16,6 @@ object NerVocab {
     }
     // This first one isn't technically sorted.
     val sortedWords = mask +: words.sorted
-    // Add one so that we can preserve index 0 for our padding
     val vocab = sortedWords.zipWithIndex.map { case (word, index) =>
       // println(s"${index}\t$word")
       word -> index
