@@ -6,7 +6,7 @@ To run the Java or Scala programs, you need to have the libraries installed and 
 
 * Linux
 
-  Make sure the `LD_LIBRARY_PATH` environment variable includes the the `lib` directory of the unzipped package, such as `/home/you/libtorch/lib`.  The operating system will use this to load `*.so` files and Java borrows them to set the value of `java.library.path`.
+  Make sure the `LD_LIBRARY_PATH` environment variable includes the the `lib` directory of the unzipped package, such as `/home/you/libtorch/lib`.  The operating system will use this to load `*.so` files and Java borrows it to set the value of `java.library.path`.
 
   ```bash
   $ export LD_LIBRARY_PATH=/home/you/libtorch/lib`
@@ -14,7 +14,7 @@ To run the Java or Scala programs, you need to have the libraries installed and 
   
 * Windows
 
-  Make sure the `PATH` environment variable includes the `lib` directory of the unzipped package, such as `D:\Users\you\libtorch\lib`.  The operating system will use this to load `*.dll` files and Java borrows them to set the value of `java.library.path`.
+  Make sure the `PATH` environment variable includes the `lib` directory of the unzipped package, such as `D:\Users\you\libtorch\lib`.  The operating system will use this to load `*.dll` files and Java borrows it to set the value of `java.library.path`.
 
   For the regular command prompt it might look like
   ```bat
