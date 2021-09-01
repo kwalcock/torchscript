@@ -6,7 +6,7 @@ import org.pytorch.IValue
 import org.pytorch.Module
 import org.pytorch.Tensor
 
-import java.io.{File, PrintWriter}
+import java.io.File
 
 object RunParTorchScript extends App {
   val debug = true
@@ -18,7 +18,7 @@ object RunParTorchScript extends App {
   val modelpath = "../data/model.pt"
 
   AppUtils.showStatus()
-  
+
   val model: Module = Module.load(modelpath)
 
   val datamodule = new NerDatamodule(datapath, embedpath)
