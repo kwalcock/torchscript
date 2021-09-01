@@ -28,7 +28,7 @@ To run the Java or Scala programs, you need to have the libraries installed and 
 
 * Mac
 
-  This is problematic.  Java [apparently](https://help.mulesoft.com/s/article/Variables-LD-LIBRARY-PATH-DYLD-LIBRARY-PATH-are-ignored-on-MAC-OS-if-System-Integrity-Protect-SIP-is-enable) does not have access to the `LD_LIBRARY_PATH` or `DYLD_LIBRARY_PATH` variables and cannot use them to build `java.library.path` or use them in `sbt` so that a torchscript program will run from there.  The operating system uses the variables to find the `*.dylib` files and Java borrows them to set the value of `java.library.path`.  So far the only way the example program has worked is by being called directly from Java after `sbt dist` with all the aforementioned variables having been set manually.
+  This is problematic.  Java [apparently](https://help.mulesoft.com/s/article/Variables-LD-LIBRARY-PATH-DYLD-LIBRARY-PATH-are-ignored-on-MAC-OS-if-System-Integrity-Protect-SIP-is-enable) and maybe [officially](https://developer.apple.com/forums/thread/13161) does not have access to the `LD_LIBRARY_PATH` or `DYLD_LIBRARY_PATH` variables and cannot use them to build `java.library.path` or use them in `sbt` so that a torchscript program will run from there.  The operating system uses the variables to find the `*.dylib` files and Java borrows them to set the value of `java.library.path`.  So far the only way the example program has worked is by being called directly from Java after `sbt dist` with all the aforementioned variables having been set manually.
 
   ```bash
   $ export LD_LIBRARY_PATH=/home/you/libtorch/lib
