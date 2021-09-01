@@ -15,7 +15,7 @@ object AppUtils {
   def showStatus(): Unit = {
     showEnv("PATH")
     showEnv("LD_LIBRARY_PATH")
-    showEnv("DYLD_LIBRAARY_PATH")
+    showEnv("DYLD_LIBRARY_PATH")
     showProp("java.library.path")
   }
 }
