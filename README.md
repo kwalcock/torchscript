@@ -6,7 +6,7 @@ To run the Java or Scala programs, you need to have the libraries installed and 
 
 * Linux
 
-  Make sure the `LD_LIBRARY_PATH` environment variable includes the the `lib` directory of the unzipped package, such as `/home/you/libtorch/lib`.  The operating system will use this to load `*.so` files and also to set the value of `java.library.path`.
+  Make sure the `LD_LIBRARY_PATH` environment variable includes the the `lib` directory of the unzipped package, such as `/home/you/libtorch/lib`.  The operating system will use this to load `*.so` files and Java borrows them to set the value of `java.library.path`.
 
   ```bash
   $ export LD_LIBRARY_PATH=/home/you/libtorch/lib`
@@ -14,24 +14,25 @@ To run the Java or Scala programs, you need to have the libraries installed and 
   
 * Windows
 
-  Make sure the `PATH` environment variable includes the `lib` directory of the unzipped package, such as `D:\Users\you\libtorch\lib`.  The operating system will use this to load `*.dll` files and also to set the value of `java.library.path`.
+  Make sure the `PATH` environment variable includes the `lib` directory of the unzipped package, such as `D:\Users\you\libtorch\lib`.  The operating system will use this to load `*.dll` files and Java borrows them to set the value of `java.library.path`.
 
-  For the regular command prompt:
+  For the regular command prompt it might look like
   ```bat
-  > set PATH=D:\Users\you\libtorch\lib;%PATH%`
+  > set PATH=D:\Users\you\libtorch\lib;%PATH%
   ```
   
-  For PowerShell:
+  and for PowerShell like this:
   ```powershell
-  PS> $env:PATH="D:\Users\you\libtorch\lib;" + $env:PATH`
+  PS> $env:PATH="D:\Users\you\libtorch\lib;" + $env:PATH
   ```
 
 * Mac
 
-  This is problematic.  Java [apparently](https://help.mulesoft.com/s/article/Variables-LD-LIBRARY-PATH-DYLD-LIBRARY-PATH-are-ignored-on-MAC-OS-if-System-Integrity-Protect-SIP-is-enable) does not have access to the `LD_LIBRARY_PATH` or `DYLD_LIBRARY_PATH` variables and cannot use them to build `java.library.path` or use them in `sbt` so that a torchscript program will run from there.  So far the only way the example program has worked is by being called directly from Java after `sbt dist` with all the aforementioned variables having been set manually.
+  This is problematic.  Java [apparently](https://help.mulesoft.com/s/article/Variables-LD-LIBRARY-PATH-DYLD-LIBRARY-PATH-are-ignored-on-MAC-OS-if-System-Integrity-Protect-SIP-is-enable) does not have access to the `LD_LIBRARY_PATH` or `DYLD_LIBRARY_PATH` variables and cannot use them to build `java.library.path` or use them in `sbt` so that a torchscript program will run from there.  The operating system uses the variables to find the `*.dylib` files and Java borrows them to set the value of `java.library.path`.  So far the only way the example program has worked is by being called directly from Java after `sbt dist` with all the aforementioned variables having been set manually.
 
   ```bash
   $ export LD_LIBRARY_PATH=/home/you/libtorch/lib
   $ export DYLD_LIBRARY_PATH=/home/you/libtorch/lib
   $ java -Djava.library.path=/home/you/libtorch/lib ...
   ```
+  
