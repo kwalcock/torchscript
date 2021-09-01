@@ -1,7 +1,7 @@
 package org.clulab.torchscript
 
 import org.clulab.torchscript.utils.Closer.AutoCloser
-import org.clulab.torchscript.utils.{FakePrinter, FileUtils, Printer, RealPrinter, ThreadUtils, Timer}
+import org.clulab.torchscript.utils.{AppUtils, FakePrinter, FileUtils, Printer, RealPrinter, ThreadUtils, Timer}
 import org.pytorch.IValue
 import org.pytorch.Module
 import org.pytorch.Tensor
@@ -17,13 +17,13 @@ object RunParTorchScript extends App {
   val embedpath = "../data/glove.840B.300d.10f.txt"
   val modelpath = "../data/model.pt"
 
+  AppUtils.showStatus()
+  
+  val model: Module = Module.load(modelpath)
+
   val datamodule = new NerDatamodule(datapath, embedpath)
   println(s"Size of dataset: ${datamodule.len}")
   println(s"Size of vocab: ${datamodule.vocabSize}")
-
-  def makeModel(): Module = Module.load(modelpath)
-
-  val model: Module = makeModel()
 
   def cropInput(tensorPair: (Tensor, Tensor)): Tensor = tensorPair._1
 
