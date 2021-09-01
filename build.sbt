@@ -1,3 +1,4 @@
+
 ThisBuild / scalaVersion     := "2.12.14"
 ThisBuild / version          := "0.1.0-SNAPSHOT"
 ThisBuild / organization     := "com.keithalcock"
@@ -11,6 +12,7 @@ lazy val library = project
 
 lazy val root = (project in file("."))
   .dependsOn(library)
+  .enablePlugins(JavaAppPackaging)
 
 lazy val demo = project
   .dependsOn(library)
