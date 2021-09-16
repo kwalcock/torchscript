@@ -1,6 +1,6 @@
 package org.clulab.torchscript
 
-import org.clulab.torchscript.utils.Closer.{AutoCloser, autoClose}
+import org.clulab.torchscript.utils.Closer.AutoCloser
 import org.clulab.torchscript.utils.StringUtils
 import org.pytorch.Tensor
 
