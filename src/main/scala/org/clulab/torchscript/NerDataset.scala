@@ -1,6 +1,7 @@
 package org.clulab.torchscript
 
 import org.clulab.torchscript.utils.Closer.AutoCloser
+import org.clulab.torchscript.utils.StringUtils
 import org.pytorch.Tensor
 
 import scala.collection.mutable
@@ -11,39 +12,38 @@ class NerDataset(datasetPath: String, val vocab: Map[String, Int]) extends Index
 
   case class Sample(tokens: Array[String], labels: Array[String])
 
-  val samples = new ArrayBuffer[Sample]()
-  val labels = mutable.Map.empty[String, Int]
+  object Sample {
+    def apply(tokensAndLabels: Array[(String, String)]): Sample = {
+      val (tokens, labels) = tokensAndLabels.unzip
+      Sample(tokens, labels)
+    }
+  }
 
-  {
-    // Return the samples and labels from this?
-    val tokens = new ArrayBuffer[String]()
-    val labels = new ArrayBuffer[String]()
-    val source = Source.fromFile(datasetPath)
+  val samples = Source.fromFile(datasetPath).autoClose { source =>
+    val samples = new ArrayBuffer[Sample]()
+    val lines = source.getLines
 
-    Source.fromFile(datasetPath).autoClose { source =>
-      source.getLines.foreach { line =>
-        val cur = line.trim
+    while (lines.nonEmpty) {
+      val sampleLines = lines.takeWhile(_ != " ").toArray
+      val tokensAndLabels = sampleLines.map { line =>
+        (
+          StringUtils.beforeFirst(line, ' ', true),
+          StringUtils.afterLast(line, ' ', false)
+        )
+      }
+      samples += Sample(tokensAndLabels)
+    }
+    samples.toArray
+  }
+  val labels = {
+    val labels = mutable.Map.empty[String, Int]
 
-        if (cur.isEmpty) {
-          samples.append(Sample(tokens.toArray, labels.toArray))
-          tokens.clear()
-          labels.clear()
-        }
-        else {
-          val Array(token, label) = cur.split(' ')
-          tokens.append(token)
-          labels.append(label)
-
-          // Make this one a set and just add
-          if (!this.labels.contains(label))
-            this.labels(label) = -1
-        }
+    samples.foreach { sample =>
+      sample.labels.foreach { label =>
+        labels.getOrElseUpdate(label, labels.size)
       }
     }
-
-    this.labels.keys.toSeq.sorted.zipWithIndex.foreach { case (key, index) =>
-      this.labels(key) = index
-    }
+    labels
   }
 
   override def length: Int = samples.length
