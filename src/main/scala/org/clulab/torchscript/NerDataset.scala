@@ -1,12 +1,11 @@
 package org.clulab.torchscript
 
-import org.clulab.torchscript.utils.Closer.AutoCloser
+import org.clulab.torchscript.utils.Closer.{AutoCloser, autoClose}
 import org.clulab.torchscript.utils.StringUtils
 import org.pytorch.Tensor
 
 import scala.annotation.tailrec
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
 class NerDataset(datasetPath: String, val vocab: Map[String, Int]) extends IndexedSeq[(Tensor, Tensor)] {
@@ -14,8 +13,8 @@ class NerDataset(datasetPath: String, val vocab: Map[String, Int]) extends Index
   protected def getSamples(lines: Iterator[String]): Array[NerDataset.Sample] = {
 
     @tailrec
-    def recGetSamples(arrayBuffer: ArrayBuffer[NerDataset.Sample]): ArrayBuffer[NerDataset.Sample] = {
-      if (lines.isEmpty) arrayBuffer
+    def recGetSamples(list: List[NerDataset.Sample]): List[NerDataset.Sample] = {
+      if (lines.isEmpty) list.reverse
       else {
         val tokensAndLabels = lines.takeWhile(_ != " ").toArray.map { line =>
           (
@@ -24,12 +23,11 @@ class NerDataset(datasetPath: String, val vocab: Map[String, Int]) extends Index
           )
         }
 
-        arrayBuffer.append(NerDataset.Sample(tokensAndLabels))
-        recGetSamples(arrayBuffer)
+        recGetSamples(NerDataset.Sample(tokensAndLabels) :: list)
       }
     }
 
-    recGetSamples(new ArrayBuffer[NerDataset.Sample]).toArray
+    recGetSamples(Nil).toArray
   }
 
   protected val samples: Array[NerDataset.Sample] = Source.fromFile(datasetPath).autoClose { source =>
