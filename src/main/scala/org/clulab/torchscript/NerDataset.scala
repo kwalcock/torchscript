@@ -44,6 +44,8 @@ class NerDataset(datasetPath: String, val vocab: Map[String, Int]) extends Index
     labels
   }
 
+  def labelLength: Int = labels.size
+
   override def length: Int = samples.length
 
   override def apply(index: Int): (Tensor, Tensor) = {

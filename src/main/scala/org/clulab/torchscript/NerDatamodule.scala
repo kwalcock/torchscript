@@ -8,7 +8,7 @@ class NerDatamodule(datasetPath: String, embeddingPath: String) {
   val  testDataset: NerDataset = new NerDataset(datasetPath + "eng-2col.testb", vocab)
 
   val size: Int = trainDataset.length + valDataset.length + testDataset.length
-  val numClasses: Int = trainDataset.labels.size
+  val numClasses: Int = trainDataset.labelLength
   val vocabSize: Int = trainDataset.vocab.size
 
   def len: Int = size
