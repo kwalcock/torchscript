@@ -1,6 +1,7 @@
 import os.path
 
 import torch
+import torch.onnx
 
 from NerDatamodule import NerDatamodule
 from ScriptedModel import ScriptedModel
@@ -11,6 +12,7 @@ def main():
     datapath = "../../../../data/ner-conll/"
     embedpath = "../../../../data/glove.840B.300d.10f.txt"
     modelpath = "../../../../data/model.pt"
+    onnxpath = "../../../../data/model.onnx"
     datamodule = NerDatamodule(datapath, embedpath, batch_size = 1)
     example_crop = 50
     crop = 0
@@ -26,7 +28,12 @@ def main():
             model = make_model(size_of_vocab ,size_of_labels)
             example_input = torch.randint(1, 70000, (1, example_crop))
             traced_forward = torch.jit.trace(model, example_input)
-            traced_forward.save(modelpath)
+            #traced_forward.save(modelpath)
+
+            example_output = model(example_input)
+            # Why does this issue a warning?
+            torch.onnx.export(traced_forward, example_input, onnxpath, example_outputs =  example_output)
+            print("kilroy was here")
         # print(traced_forward.code)
         return ScriptedModel(traced_forward)
 
