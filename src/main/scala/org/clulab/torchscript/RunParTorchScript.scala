@@ -9,9 +9,9 @@ import org.pytorch.Tensor
 import java.io.File
 
 object RunParTorchScript extends App {
-  val debug = true
-  val threads = 1
-  val loops = 64
+  val debug = false
+  val threads = 4
+  val loops = 12
 
   val datapath = "../data/ner-conll/"
   val embedpath = "../data/glove.840B.300d.10f.txt"
@@ -34,7 +34,7 @@ object RunParTorchScript extends App {
       val result = timer.time {
         model.forward(IValue.from(cropped))
       }
-      printer.println(result.toTensor.shape.mkString(", "))
+      // printer.println(result.toTensor.shape.mkString(", "))
       printer.println(result.toTensor.getDataAsFloatArray.map(value => f"$value%1.8f").mkString(", ")) // can't be double
       timer.getElapsed
     }
@@ -46,7 +46,7 @@ object RunParTorchScript extends App {
     if (debug)
       new FakePrinter()
     else
-      new RealPrinter(FileUtils.newPrintWriterFromFile(new File(s"RunTorchScript-$index.txt")))
+      new RealPrinter(FileUtils.newPrintWriterFromFile(new File(s"RunParTorchScript-$index.out")))
   }
 
 
