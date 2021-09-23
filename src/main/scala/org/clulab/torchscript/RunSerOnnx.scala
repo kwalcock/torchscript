@@ -29,29 +29,29 @@ object RunSerOnnx extends App {
 
   def runDataset(name: String, dataset: NerDataset): Unit = {
     val times = dataset.indices.map { index =>
+      // TODO: This can be done more quickly, but it isn't times anyway.
       val tensorPair = dataset.applyLong(index)
       val cropped = cropInput(tensorPair)
       val longArray = cropped.getDataAsLongArray()
       val longBuffer = LongBuffer.wrap(longArray)
       val shape = cropped.shape
+      val onnxTensor = OnnxTensor.createTensor(ortEnvironment, longBuffer, shape)
+
+      inputs.put("input", onnxTensor)
 
       val result = timer.time {
-        val onnxTensor = OnnxTensor.createTensor(ortEnvironment, longBuffer, shape)
-        inputs.put("input", onnxTensor)
-
         session.run(inputs).autoClose { outputs =>
-          outputs.forEach { output =>
-            val (name, value) = (output.getKey, output.getValue)
-            // Dimensions are [1, 50, 8] for some reason.  Because sentence was cropped to 50.
-            val values = value.getValue.asInstanceOf[Array[Array[Array[Float]]]]
+          val output = outputs
+                .get("output").get
+                .getValue
+                .asInstanceOf[Array[Array[Array[Float]]]]
+                .head
+                .flatten
 
-            val result = values.head.head
-            println(result.map(value => f"$value%1.8f").mkString(", ")) // can't be double
-          }
+          output
         }
       }
-      // println(result.toTensor.shape.mkString(", "))
-      // println(result.toTensor.getDataAsFloatArray.map(value => f"$value%1.8f").mkString(", ")) // can't be double
+      println(result.map(value => f"$value%1.8f").mkString(", "))
       timer.getElapsed
     }
     println(f"  Mean $name sample time: ${timer.mean(times)}%.8f")
