@@ -51,7 +51,7 @@ object RunSerOnnx extends App {
           output
         }
       }
-      println(result.map(value => f"$value%1.8f").mkString(", "))
+      // println(result.map(value => f"$value%1.8f").mkString(", "))
       timer.getElapsed
     }
     println(f"  Mean $name sample time: ${timer.mean(times)}%.8f")
