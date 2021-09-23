@@ -63,6 +63,29 @@ class NerDataset(datasetPath: String, val vocab: Map[String, Int]) extends Index
       Tensor.fromBlob(labelIndexes, Array(1L, labelIndexes.length.toLong))
     )
   }
+
+  def crop(values: Array[Long]): Array[Long] = {
+    val newArray = Array.fill[Long](50)(0)
+
+    Array.copy(values, 0, newArray, 0, math.min(values.length, newArray.length))
+    newArray
+  }
+
+  def applyLong(index: Int): (Tensor, Tensor) = {
+    require(0 <= index && index < length)
+    val sample = samples(index)
+    val tokenIndexes = crop(sample.tokens.map { token =>
+      vocab.getOrElse(token, vocab(NerVocab.mask)).toLong
+    })
+    val labelIndexes = crop(sample.labels.map { label =>
+      labels(label).toLong
+    })
+
+    (
+      Tensor.fromBlob(tokenIndexes, Array(1L, tokenIndexes.length.toLong)),
+      Tensor.fromBlob(labelIndexes, Array(1L, labelIndexes.length.toLong))
+    )
+  }
 }
 
 object NerDataset {

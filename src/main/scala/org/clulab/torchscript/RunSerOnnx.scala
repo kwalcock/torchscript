@@ -5,7 +5,7 @@ import org.clulab.torchscript.utils.{AppUtils, Timer}
 import org.clulab.torchscript.utils.Closer.AutoCloser
 import org.pytorch.Tensor
 
-import java.nio.IntBuffer
+import java.nio.LongBuffer
 import java.util.{HashMap => JHashMap}
 
 object RunSerOnnx extends App {
@@ -28,14 +28,15 @@ object RunSerOnnx extends App {
   val timer = new Timer("The timer")
 
   def runDataset(name: String, dataset: NerDataset): Unit = {
-    val times = dataset.map { tensorPair =>
+    val times = dataset.indices.map { index =>
+      val tensorPair = dataset.applyLong(index)
       val cropped = cropInput(tensorPair)
-      val intArray = cropped.getDataAsIntArray()
-      val intBuffer = IntBuffer.wrap(intArray)
+      val longArray = cropped.getDataAsLongArray()
+      val longBuffer = LongBuffer.wrap(longArray)
       val shape = cropped.shape
 
       val result = timer.time {
-        val onnxTensor = OnnxTensor.createTensor(ortEnvironment, intBuffer, shape)
+        val onnxTensor = OnnxTensor.createTensor(ortEnvironment, longBuffer, shape)
         inputs.put("input", onnxTensor)
 
         session.run(inputs).autoClose { outputs =>
