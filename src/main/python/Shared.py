@@ -64,6 +64,6 @@ def run_dataset(model, name, crop, dataset):
         result = model.forward(cropped)
         times.append(time.time() - start)
         # print_shape(result)
-        # print_data(result)
+        print_data(result)
     print(f"  Mean {name} sample time: {sum(times)/len(times):.8f}")
     print(f"Stddev {name} sample time: {stdev(times):.8f}")

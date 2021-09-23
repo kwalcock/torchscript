@@ -20,17 +20,24 @@ def main():
     print(f"Size of vocab: {len(datamodule.train_dataset.vocab)}")
 
     def save_model(model, input):
+        output = model(input)
         input_names = [ "input" ]
         output_names = [ "output" ]
+        dynamic_axes = {
+            "input": { 1: "dynamic_input" },
+            "output": { 1: "dynamic_output" }
+        }
         # Why does this issue a warning?
-        torch.onnx.export(model, example_input, onnxpath, verbose = True, input_names = input_names, output_names = output_names)
+        torch.onnx.export(model, input, modelpath, verbose = False, \
+                input_names = input_names, output_names = output_names, \
+                example_outputs = output, dynamic_axes = dynamic_axes)
         print("The onnx model was saved.")
 
     def make_scripted_model(size_of_vocab, size_of_labels):
-        if False:
-            # Don't bother to load it.
+        if os.path.isfile(modelpath) and False:
+            "Don't bother to load it."
         else:
-            example_input = torch.randint(1, size_of_vocab, (1, example_crop))
+            example_input = torch.randint(1, size_of_vocab - 1, (1, example_crop))
             model = make_model(size_of_vocab, size_of_labels)
             traced_model = torch.jit.trace(model, example_input)
             save_model(traced_model, example_input)
@@ -39,7 +46,7 @@ def main():
     model = make_scripted_model(len(datamodule.train_dataset.vocab), datamodule.num_classes)
 
     with torch.no_grad():
-        # Don't run the onnx model here
+        "Don't run the onnx model here."
         # run_dataset(model, "train", crop, datamodule.train_dataloader())
         # run_dataset(model, "  val", crop, datamodule.val_dataloader())
         # run_dataset(model, " test", crop, datamodule.test_dataloader())
