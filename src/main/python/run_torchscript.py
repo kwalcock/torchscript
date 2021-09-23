@@ -25,14 +25,20 @@ def main():
         if os.path.isfile(modelpath):
             traced_forward = torch.jit.load(modelpath)
         else:
-            model = make_model(size_of_vocab ,size_of_labels)
             example_input = torch.randint(1, 70000, (1, example_crop))
-            traced_forward = torch.jit.trace(model, example_input)
+            model = make_model(size_of_vocab ,size_of_labels)
+
+            # TorchScript code
+            #traced_forward = torch.jit.trace(model, example_input)
             #traced_forward.save(modelpath)
 
-            example_output = model(example_input)
+            # Onnx code
+            input_names = [ "input"]
+            output_names = [ "output" ]
+            # example_output = model(example_input)
             # Why does this issue a warning?
-            torch.onnx.export(traced_forward, example_input, onnxpath, example_outputs =  example_output)
+            torch.onnx.export(model, example_input, onnxpath, verbose = True, input_names = input_names, output_names = output_names)
+            exit(0)
             print("kilroy was here")
         # print(traced_forward.code)
         return ScriptedModel(traced_forward)
