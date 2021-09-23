@@ -40,11 +40,13 @@ object RunSerOnnx extends App {
         inputs.put("input", onnxTensor)
 
         session.run(inputs).autoClose { outputs =>
-           // manipulate the results
           outputs.forEach { output =>
             val (name, value) = (output.getKey, output.getValue)
-            println(name)
-            println(value)
+            // Dimensions are [1, 50, 8] for some reason.  Because sentence was cropped to 50.
+            val values = value.getValue.asInstanceOf[Array[Array[Array[Float]]]]
+
+            val result = values.head.head
+            println(result.map(value => f"$value%1.8f").mkString(", ")) // can't be double
           }
         }
       }
