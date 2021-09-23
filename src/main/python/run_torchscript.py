@@ -28,7 +28,7 @@ def main():
             # If the file already exists, just load it.
             model = torch.jit.load(modelpath)
         else:
-            example_input = torch.randint(1, size_of_vocab, (1, example_crop))
+            example_input = torch.randint(1, size_of_vocab - 1, (1, example_crop))
             model = make_model(size_of_vocab, size_of_labels)
             traced_model = torch.jit.trace(model, example_input)
             save_model(traced_model, example_input)
