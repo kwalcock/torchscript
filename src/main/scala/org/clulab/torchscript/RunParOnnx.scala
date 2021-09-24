@@ -10,9 +10,9 @@ import java.nio.LongBuffer
 import java.util.{HashMap => JHashMap}
 
 object RunParOnnx extends App {
-  val debug = false
-  val threads = 4
-  val loops = 12
+  val debug = true
+  val threads = 128
+  val loops = 64
 
   val datapath = "../data/ner-conll/"
   val embedpath = "../data/glove.840B.300d.10f.txt"
