@@ -44,6 +44,8 @@ class NerDataset(datasetPath: String, val vocab: Map[String, Int]) extends Index
     labels
   }
 
+  def labelLength: Int = labels.size
+
   override def length: Int = samples.length
 
   override def apply(index: Int): (Tensor, Tensor) = {
@@ -54,6 +56,22 @@ class NerDataset(datasetPath: String, val vocab: Map[String, Int]) extends Index
     }
     val labelIndexes = sample.labels.map { label =>
       labels(label)
+    }
+
+    (
+      Tensor.fromBlob(tokenIndexes, Array(1L, tokenIndexes.length.toLong)),
+      Tensor.fromBlob(labelIndexes, Array(1L, labelIndexes.length.toLong))
+    )
+  }
+
+  def applyLong(index: Int): (Tensor, Tensor) = {
+    require(0 <= index && index < length)
+    val sample = samples(index)
+    val tokenIndexes = sample.tokens.map { token =>
+      vocab.getOrElse(token, vocab(NerVocab.mask)).toLong
+    }
+    val labelIndexes = sample.labels.map { label =>
+      labels(label).toLong
     }
 
     (
