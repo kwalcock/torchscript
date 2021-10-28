@@ -29,7 +29,7 @@ object RunSerOnnx extends App {
 
   def runDataset(name: String, dataset: NerDataset): Unit = {
     val times = dataset.indices.map { index =>
-      // TODO: This can be done more quickly, but it isn't times anyway.
+      // TODO: This can be done more quickly, but it isn't timed anyway.
       val tensorPair = dataset.applyLong(index)
       val cropped = cropInput(tensorPair)
       val longArray = cropped.getDataAsLongArray()
